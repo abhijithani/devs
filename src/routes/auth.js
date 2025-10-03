@@ -45,7 +45,7 @@ authRouter.post("/login", async (req, res) => {
             const token = await user.getJWT();
 
             res.cookie("token", token);
-            res.send("login succesfully")
+            res.send(user)
         }
         else {
             throw new Error("password Not correct")
