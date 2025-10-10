@@ -13,9 +13,7 @@ authRouter.post("/signUp", async (req, res) => {
 
         //Encrypt the password
         const passwordHash = await bcrypt.hash(password, 10);
-        console.log(passwordHash);
-
-
+        
         //Creating a new instance fo the user model
         const user = new User({
             firstName,
@@ -23,8 +21,13 @@ authRouter.post("/signUp", async (req, res) => {
             emailId,
             password: passwordHash,
         });
-        await user.save();
-        res.send("user added sucessfully");
+        const savedUser = await user.save();
+        const token = await savedUser.getJWT();
+
+        res.cookie("token", token, {
+            expires: new Date(Date.now() + 8 * 360000),
+        });
+        res.json({message: "user added sucessfully", data: savedUser});
     }
     catch (err) {
         res.status(400).send("ERROR: " + err.message)
@@ -44,7 +47,9 @@ authRouter.post("/login", async (req, res) => {
 
             const token = await user.getJWT();
 
-            res.cookie("token", token);
+            res.cookie("token", token,{
+                expires: new Date(Date.now() + 8 * 360000),
+            });
             res.send(user)
         }
         else {

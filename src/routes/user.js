@@ -4,7 +4,7 @@ const userRouter = express.Router();
 const ConnectionRequest = require("../models/connectinRequest");
 const User = require("../models/user");
 
-const USER_SAFE_DATA = "firstName lastName photourl age gender about skills"
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills"
 
 //Get all the pending conncection requests 
 userRouter.get("/user/requests/received", userAuth, async (req, res) =>{
@@ -14,7 +14,7 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) =>{
         const connectionRequest = await  ConnectionRequest.find({
             toUserId: loggedInUser._id,
             status: "interested"
-        }).populate("fromUserId", ["firstName", "lastName"])
+        }).populate("fromUserId", ["firstName", "lastName", "lastName", "photoUrl", "about"])
 
         res.json({
             message: "Data  fetched succesfully",
@@ -36,8 +36,8 @@ userRouter.get("/user/connection", userAuth , async (req, res) => {
                 {toUserId: loggedInUser._id, status : "accepted"},
                 {fromUserId: loggedInUser._id, status : "accepted"}
             ]
-        }).populate("fromUserId", ["firstName", "lastName"]).
-        populate("toUserId", ["firstName", "lastName"])
+        }).populate("fromUserId", ["firstName", "lastName","photoUrl", "about"]).
+            populate("toUserId", ["firstName", "lastName", "photoUrl", "about"])
         
         const data = connectionRequests.map((row) =>{
             if(row.fromUserId._id.toString() === loggedInUser._id.toString()){
